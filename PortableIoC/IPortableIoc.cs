@@ -19,6 +19,33 @@ namespace PortableIoC
         void Register<T>(Func<IPortableIoC, T> creation, string label = "");
 
         /// <summary>
+        /// Register a type to be created with an alias to create that includes an
+        /// instance of the IoC container
+        /// </summary>
+        /// <typeparam name="T">The type that is going to be implemented</typeparam>
+        /// <typeparam name="TImpl">The type's implementation that will use a default Resolve for its dependencies</typeparam>
+        /// <param name="label">A unique label that allows multiple implementations of the same type</param>
+        void Register<T, TImpl>(string label = "");
+
+        /// <summary>
+        /// Resolve the implementation of a type (interface, abstract class, etc.)
+        /// </summary>
+        /// <param name="t">The type to resolve the implementation for</param>
+        /// <param name="label">A unique label that allows multiple implementations of the same type</param>
+        /// <returns>The implementation (defaults to a shared implementation)</returns>
+        object Resolve(Type t, string label = "");
+
+        /// <summary>
+        /// Overload to resolve the implementation of a type with the option to create
+        /// a non-shared instance
+        /// </summary>
+        /// <param name="t">The type to resolve</param>
+        /// <param name="createNew">True for a non-shared instance</param>
+        /// <param name="label">A unique label that allows multiple implementations of the same type</param>
+        /// <returns>The implementation of the type</returns>
+        object Resolve(Type t, bool createNew, string label = "");
+
+        /// <summary>
         /// Resolve the implementation of a type (interface, abstract class, etc.)
         /// </summary>
         /// <typeparam name="T">The type to resolve the implementation for</typeparam>

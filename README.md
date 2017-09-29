@@ -1,7 +1,21 @@
 # Project Description
+This is a fork of PortableIoC created by Jeremy Likness.
+
 Portable IOC is a tiny thread-safe Inversion of Control container for
 Universal Windows Platform apps.
 
+## About This Fork
+This fork is intended to provide a simpler way register and resolve dependencies
+
+For example, this fork allows you to register an instance of IBar that depends on IFoo like this: 
+
+` ioc.Register<IBar, Bar>() `
+
+Instead of like this:
+
+` ioc.Register<IBar>(ioc => new Bar(ioc.Resolve<IFoo>()); `
+
+## About PortableIoC
 Portable IOC is a tiny (less than 200 lines of code) thread-safe and portable Inversion of Control container. It is designed to make it simple and easy to wire dependencies for client projects on the Universal Windows Platform (UWP). Features include:
 
 * Dependency resolution

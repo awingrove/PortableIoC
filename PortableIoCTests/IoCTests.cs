@@ -314,5 +314,17 @@ namespace PortableIoCTests
             Assert.IsNotNull(actual, "Test failed: actual should not be null.");
             Assert.IsNotNull(actual.Bar, "Test failed; actual property for Bar should not be null.");
         }
+
+        [TestMethod]
+        public void GivenConstructorDependencyWithoutCreateWhenInstanceRequestedThenShouldReturnInstanceWithDependencyResolved()
+        {
+            _target.Register<IBar, SimpleBar>();
+            _target.Register<IFoo, SimpleFoo>();
+            _target.Register<IBaz, SimpleBaz>();
+            var actual = _target.Resolve<IBaz>();
+            Assert.IsNotNull(actual, "Test failed: actual should not be null.");
+            Assert.IsNotNull(actual.Foo, "Test failed; actual property for Foo should not be null.");
+            Assert.IsNotNull(actual.Bar, "Test failed; actual property for Bar should not be null.");
+        }
     }
 }

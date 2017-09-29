@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 
 namespace PortableIoC
@@ -14,6 +15,9 @@ namespace PortableIoC
 
         private const string InvalidResolution =
             "Cannot resolve type {0} for label {1}.";
+
+        private const string InvalidConstructor =
+            "Cannot resolve type {0} for label {1} as no suitable constructor for {2} could be found.";
 
         private readonly IDictionary<string, IList<IIoCRegistration>> _containers =
             new Dictionary<string, IList<IIoCRegistration>>();
@@ -59,6 +63,104 @@ namespace PortableIoC
         }
 
         /// <summary>
+        /// Register a type to be created with an alias to create that includes an
+        /// instance of the IoC container
+        /// </summary>
+        /// <typeparam name="T">The type that is going to be implemented</typeparam>
+        /// <typeparam name="TImpl">The implementation to create the new instance of the type</typeparam>
+        /// <param name="label">A unique label that allows multiple implementations of the same type</param>
+        public void Register<T, TImpl>(string label = "")
+        {
+            label = string.IsNullOrEmpty(label) ? DefaultLabel : label;
+
+            Register(ioc =>
+            {
+                var implementation = typeof(TImpl);
+
+                // find first constructor that takes only interfaces
+                var interfaceConstructor = implementation.GetConstructors().FirstOrDefault(x => x.GetParameters().Count() > 0 && x.GetParameters().All(a => a.ParameterType.IsInterface));
+                if (interfaceConstructor == null)
+                {
+                    // find parameterless constructor
+                    interfaceConstructor = implementation.GetConstructors().FirstOrDefault(x => x.GetParameters().Count() == 0);
+                }
+
+                if (interfaceConstructor == null)
+                {
+                    throw new InvalidOperationException(
+                        string.Format(
+                            InvalidConstructor,
+                            label,
+                            typeof(T).FullName,
+                            implementation.FullName));
+                }
+
+                // resolve each of the contructor's parameters
+                ParameterInfo[] constructorParameters = interfaceConstructor.GetParameters();
+                List<object> parameters = new List<object>(constructorParameters.Length);
+                foreach (ParameterInfo parameterInfo in constructorParameters)
+                {
+                    parameters.Add(ioc.Resolve(parameterInfo.ParameterType));
+                }
+
+                // invoke the constructor
+                return (T)interfaceConstructor.Invoke(parameters.ToArray());
+            }, label);
+        }
+
+        /// <summary>
+        /// Resolve the implementation of a type (interface, abstract class, etc.)
+        /// </summary>
+        /// <param name="t">The type to resolve the implementation for</param>
+        /// <param name="label">A unique label that allows multiple implementations of the same type</param>
+        /// <returns>The implementation (defaults to a shared implementation)</returns>
+        public object Resolve(Type t, string label = "")
+        {
+            label = string.IsNullOrEmpty(label) ? DefaultLabel : label;
+
+            return Resolve(t, false, label);
+        }
+
+        /// <summary>
+        /// Resolve the implementation of a type (interface, abstract class, etc.)
+        /// </summary>
+        /// <param name="t">The type to resolve the implementation for</param>
+        /// <param name="createNew">True for a non-shared instance</param>
+        /// <param name="label">A unique label that allows multiple implementations of the same type</param>
+        /// <returns>The implementation of the type</returns>
+        public object Resolve(Type t, bool createNew, string label = "")
+        {
+            label = string.IsNullOrEmpty(label) ? DefaultLabel : label;
+
+            CheckContainer(label);
+
+            if (!Exists(label, t))
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                    InvalidResolution,
+                    t.FullName,
+                    label));
+            }
+
+            lock (_mutex)
+            {
+                var iocRegistration = _containers[label].FirstOrDefault(ioc => ioc.Type == t.FullName);
+
+                if (iocRegistration == null)
+                {
+                    throw new InvalidOperationException(
+                        string.Format(
+                        InvalidResolution,
+                        t.FullName,
+                        label));
+                }
+
+                return iocRegistration.GetInstance(this, createNew);
+            }
+        }
+
+        /// <summary>
         /// Resolve the implementation of a type (interface, abstract class, etc.)
         /// </summary>
         /// <typeparam name="T">The type to resolve the implementation for</typeparam>
@@ -68,7 +170,7 @@ namespace PortableIoC
         {
             label = string.IsNullOrEmpty(label) ? DefaultLabel : label;
 
-            return Resolve<T>(false, label);
+            return (T)Resolve(typeof(T), false, label);
         }
 
         /// <summary>
@@ -83,33 +185,7 @@ namespace PortableIoC
         {
             label = string.IsNullOrEmpty(label) ? DefaultLabel : label;
 
-            CheckContainer(label);
-
-            if (!Exists(label, typeof(T)))
-            {
-                throw new InvalidOperationException(
-                    string.Format(
-                    InvalidResolution,
-                    typeof(T).FullName,
-                    label));
-            }
-
-            lock (_mutex)
-            {
-                var iocRegistration = _containers[label].FirstOrDefault(ioc => ioc.Type == typeof(T).FullName)
-                                      as IocRegistration<T>;
-
-                if (iocRegistration == null)
-                {
-                    throw new InvalidOperationException(
-                        string.Format(
-                            InvalidResolution,
-                            typeof(T).FullName,
-                            label));
-                }
-
-                return iocRegistration.GetTypedInstance(this, createNew);
-            }
+            return (T)Resolve(typeof(T), createNew, label);
         }
 
         /// <summary>

@@ -53,8 +53,10 @@
     <Compile Include="IoCTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestHelpers\IBar.cs" />
+    <Compile Include="TestHelpers\IBaz.cs" />
     <Compile Include="TestHelpers\IFoo.cs" />
     <Compile Include="TestHelpers\SimpleBar.cs" />
+    <Compile Include="TestHelpers\SimpleBaz.cs" />
     <Compile Include="TestHelpers\SimpleFoo.cs" />
   </ItemGroup>
   <ItemGroup>
