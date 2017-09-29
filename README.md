@@ -9,13 +9,17 @@ This fork is intended to provide a simpler way register and resolve dependencies
 
 For example, this fork allows you to register an instance of IBar that depends on IFoo like this: 
 
-` ioc.Register<IFoo, Foo>() `
-` ioc.Register<IBar, Bar>() `
+```
+ioc.Register<IFoo, Foo>()
+ioc.Register<IBar, Bar>()
+```
 
 Instead of like this:
 
-` ioc.Register<IFoo>(ioc => new Foo()); `
-` ioc.Register<IBar>(ioc => new Bar(ioc.Resolve<IFoo>()); `
+```
+ioc.Register<IFoo>(ioc => new Foo());
+ioc.Register<IBar>(ioc => new Bar(ioc.Resolve<IFoo>());
+```
 
 ## About PortableIoC
 Portable IOC is a tiny (less than 200 lines of code) thread-safe and portable Inversion of Control container. It is designed to make it simple and easy to wire dependencies for client projects on the Universal Windows Platform (UWP). Features include:
