@@ -21,7 +21,7 @@ ioc.Register<IFoo>(ioc => new Foo());
 ioc.Register<IBar>(ioc => new Bar(ioc.Resolve<IFoo>());
 ```
 
-Registered implementations should have a constructor that takes only interfaces. These are then resovlved as dependencies through the container. For example, Bar contains the following constructor:
+Registered implementations should have a constructor that takes only interfaces. These are then resolved as dependencies through the container. For example, Bar contains the following constructor:
 
 ```
 public Bar(IFoo foo) ...
