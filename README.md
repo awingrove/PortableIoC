@@ -21,6 +21,14 @@ ioc.Register<IFoo>(ioc => new Foo());
 ioc.Register<IBar>(ioc => new Bar(ioc.Resolve<IFoo>());
 ```
 
+Registered implementations should have a constructor that takes only interfaces. These are then resovlved as dependencies through the container. For example, Bar contains the following constructor:
+
+```
+public Bar(IFoo foo) ...
+```
+
+Alternatively the implementation can have default parameterless constructor, like Foo.
+
 ## About PortableIoC
 Portable IOC is a tiny (less than 200 lines of code) thread-safe and portable Inversion of Control container. It is designed to make it simple and easy to wire dependencies for client projects on the Universal Windows Platform (UWP). Features include:
 
