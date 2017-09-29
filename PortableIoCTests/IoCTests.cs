@@ -1,7 +1,7 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using PortableIoC;
 using PortableIoCTests.TestHelpers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PortableIoCTests
 {

@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PortableIoC;
-using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 using PortableIoCTests.TestHelpers;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PortableIoCTests
 {
