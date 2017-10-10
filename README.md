@@ -5,15 +5,29 @@ Portable IOC is a tiny thread-safe Inversion of Control container for
 Universal Windows Platform apps.
 
 ## About This Fork
-This fork is intended to provide a simpler way register and resolve dependencies
+This fork is intended to provide a simpler way register and resolve dependencies.
 
 For example, this fork allows you to register an instance of IBar that depends on IFoo like this: 
 
-` ioc.Register<IBar, Bar>() `
+```
+ioc.Register<IFoo, Foo>()
+ioc.Register<IBar, Bar>()
+```
 
 Instead of like this:
 
-` ioc.Register<IBar>(ioc => new Bar(ioc.Resolve<IFoo>()); `
+```
+ioc.Register<IFoo>(ioc => new Foo());
+ioc.Register<IBar>(ioc => new Bar(ioc.Resolve<IFoo>());
+```
+
+Registered implementations should have a constructor that takes only interfaces. These are then resolved as dependencies through the container. For example, Bar contains the following constructor:
+
+```
+public Bar(IFoo foo) ...
+```
+
+Alternatively the implementation can have default parameterless constructor, like Foo.
 
 ## About PortableIoC
 Portable IOC is a tiny (less than 200 lines of code) thread-safe and portable Inversion of Control container. It is designed to make it simple and easy to wire dependencies for client projects on the Universal Windows Platform (UWP). Features include:
