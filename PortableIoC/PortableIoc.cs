@@ -78,7 +78,7 @@ namespace PortableIoC
                 var implementation = typeof(TImpl);
 
                 // find first constructor that takes only interfaces
-                var interfaceConstructor = implementation.GetConstructors().FirstOrDefault(x => x.GetParameters().Count() > 0 && x.GetParameters().All(a => a.ParameterType.IsInterface));
+                var interfaceConstructor = implementation.GetConstructors().FirstOrDefault(x => x.GetParameters().Count() > 0 && x.GetParameters().All(a => a.ParameterType.IsInterface || a.ParameterType.IsAbstract));
                 if (interfaceConstructor == null)
                 {
                     // find parameterless constructor
